@@ -139,35 +139,59 @@ class TestTranscription:
 
 
 # ============================================================================
-# TESTES DO ANALYSIS
+# TESTES DO MEDGEMMA EXTRACTOR
 # ============================================================================
 
-class TestAnalysis:
-    """Testes para o módulo de análise de sintomas."""
+class TestMedGemmaExtractor:
+    """Testes para o módulo de extração MedGemma."""
 
-    def test_analysis_config(self):
-        """Deve criar configuração de análise."""
-        from src.agents.nodes.analysis import AnalysisConfig
+    def test_medgemma_config_from_env(self):
+        """Deve criar config do MedGemma a partir de env vars."""
+        import os
+        from src.agents.nodes.medgemma_extractor import MedGemmaConfig
         
-        config = AnalysisConfig()
+        os.environ["MEDGEMMA_MODEL"] = "medgemma-1.5-27b"
+        config = MedGemmaConfig.from_env()
         
-        assert config.top_k == 5
-        assert 0.0 <= config.alpha <= 1.0
-        assert config.gemini_model == "gemini-2.0-flash"
+        assert config.model_name == "medgemma-1.5-27b"
+        assert config.enable_cot is True
 
-    def test_hybrid_retriever_mock(self):
-        """Deve usar mock quando Pinecone não disponível."""
-        from src.agents.nodes.analysis import HybridRetriever, AnalysisConfig
+    @pytest.mark.asyncio
+    async def test_extractor_initialization(self, mocker):
+        """Deve inicializar extrator corretamente (mocked)."""
+        from src.agents.nodes.medgemma_extractor import MedGemmaExtractor
         
-        config = AnalysisConfig()
-        retriever = HybridRetriever(config)
+        # Mock ChatVertexAI para evitar chamadas reais
+        mocker.patch("langchain_google_vertexai.ChatVertexAI")
         
-        # Mock retrieval não requer Pinecone
-        results = retriever._mock_retrieval("dor no peito")
+        extractor = MedGemmaExtractor()
+        assert extractor.config.model_name == "medgemma-1.5-27b"
+
+    def test_convert_to_legacy_format(self):
+        """Deve converter ClinicalAssessment para formato legado."""
+        from src.agents.nodes.medgemma_extractor import (
+            ClinicalAssessment, 
+            ExtractedSymptom, 
+            convert_to_legacy_format
+        )
         
-        assert len(results) > 0
-        assert "content" in results[0]
-        assert results[0]["score"] > 0
+        assessment = ClinicalAssessment(
+            symptoms=[
+                ExtractedSymptom(
+                    name="cefaleia", 
+                    severity="medium",
+                    body_region="frontal",
+                    duration="2 dias"
+                )
+            ]
+        )
+        
+        legacy = convert_to_legacy_format(assessment)
+        
+        assert len(legacy) == 1
+        assert legacy[0].name == "cefaleia"
+        assert legacy[0].severity == "medium"
+        assert legacy[0].body_region == "frontal"
 
 
 # ============================================================================

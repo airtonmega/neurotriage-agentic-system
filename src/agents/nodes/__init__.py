@@ -10,10 +10,10 @@ from src.agents.nodes.transcription import (
     TranscriptionResult,
     DeepgramTranscriber,
 )
-from src.agents.nodes.analysis import (
-    extract_symptoms,
-    SymptomExtractor,
-    HybridRetriever,
+from src.agents.nodes.medgemma_extractor import (
+    extract_symptoms_medgemma,
+    MedGemmaExtractor,
+    MedGemmaConfig,
 )
 from src.agents.nodes.risk_guardrail import (
     evaluate_risk,
@@ -30,9 +30,10 @@ __all__ = [
     "TranscriptionResult",
     "DeepgramTranscriber",
     # Analysis
-    "extract_symptoms",
-    "SymptomExtractor",
-    "HybridRetriever",
+    # Analysis (MedGemma)
+    "extract_symptoms_medgemma",
+    "MedGemmaExtractor",
+    "MedGemmaConfig",
     # Risk Guardrail
     "evaluate_risk",
     "RiskEvaluator",

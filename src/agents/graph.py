@@ -283,13 +283,17 @@ async def analysis_node(state: TriageState) -> dict:
             SymptomEntity(name="náusea", severity="low")
         ]
     """
-    from src.agents.nodes.analysis import extract_symptoms
+    from src.agents.nodes.medgemma_extractor import extract_symptoms_medgemma
     
     # Chama o extrator de sintomas
-    symptoms = await extract_symptoms(
-        text=state["transcription_masked"],  # Texto SEM dados pessoais
-        conversation_id=state["conversation_id"],
+    symptoms_assessment = await extract_symptoms_medgemma(
+        transcription=state["transcription_masked"],  # Texto SEM dados pessoais
+        # conversation_id ignorado pois MedGemma não precisa
     )
+    
+    # Converter para formato de lista plana usado pelo grafo
+    from src.agents.nodes.medgemma_extractor import convert_to_legacy_format
+    symptoms = convert_to_legacy_format(symptoms_assessment)
     
     # Retorna os sintomas encontrados
     # Como declaramos "Annotated[..., operator.add]", os sintomas são ADICIONADOS

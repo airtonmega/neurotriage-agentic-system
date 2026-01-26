@@ -32,7 +32,6 @@ async def run_demo():
     from src.agents.graph import SymptomEntity, RiskAssessment
     from src.agents.nodes.risk_guardrail import RiskEvaluator
     from src.agents.nodes.soap_generator import generate_soap_template
-    from src.agents.nodes.analysis import HybridRetriever, AnalysisConfig
     
     # Carregar casos de teste
     golden_path = Path(__file__).parent / "tests" / "golden_dataset" / "cases.json"
@@ -68,7 +67,9 @@ async def run_demo():
     
     # Processar cada caso
     evaluator = RiskEvaluator()
-    retriever = HybridRetriever(AnalysisConfig())
+    # Mock RAG context for demo
+    def mock_retrieval(query):
+        return [{"source": "Protocolo IAM", "score": 0.95, "content": "Sintomas de IAM incluem dor..."}]
     
     results = []
     
@@ -100,7 +101,7 @@ async def run_demo():
         
         # Buscar contexto no conhecimento médico
         print(f"\n📚 Buscando contexto médico...")
-        context_docs = retriever._mock_retrieval(transcription)
+        context_docs = mock_retrieval(transcription)
         if context_docs:
             print(f"   Encontrado: {context_docs[0]['source']} (score: {context_docs[0]['score']:.2f})")
         
