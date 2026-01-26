@@ -1,0 +1,181 @@
+[tool.poetry]
+name = "neurotriage-ai"
+version = "0.1.0"
+description = "Agentic Telemedicine Triage System with LangGraph and Databricks Mosaic AI"
+authors = ["Your Name <your.email@company.com>"]
+readme = "README.md"
+license = "MIT"
+packages = [{include = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+# Core LangChain/LangGraph
+langgraph = "^0.2.0"
+langchain = "^0.3.0"
+langchain-google-vertexai = "^2.0.0"
+langchain-community = "^0.3.0"
+
+# Databricks & MLFlow
+databricks-sdk = "^0.40.0"
+mlflow = "^2.18.0"
+delta-spark = "^3.2.0"
+
+# Data Processing
+pydantic = "^2.10.0"
+pandas = "^2.2.0"
+numpy = "^2.0.0"
+
+# Audio Processing - Deepgram Nova-3 Medical (HIPAA, <300ms latency)
+deepgram-sdk = "^3.7.0"
+pydub = "^0.25.1"
+
+# Pinecone - RAG Híbrido (BM25 + Semântico)
+pinecone-client = "^5.0.0"
+rank-bm25 = "^0.2.2"
+
+# NLP & NER
+spacy = "^3.8.0"
+
+# Streaming
+google-cloud-pubsub = "^2.24.0"
+
+# Async
+aiohttp = "^3.11.0"
+httpx = "^0.28.0"
+
+# Utilities
+python-dotenv = "^1.0.0"
+structlog = "^24.4.0"
+tenacity = "^9.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.0"
+pytest-asyncio = "^0.24.0"
+pytest-cov = "^6.0.0"
+ruff = "^0.8.0"
+mypy = "^1.13.0"
+pre-commit = "^4.0.0"
+ipykernel = "^6.29.0"
+
+[tool.poetry.group.test.dependencies]
+pytest-mock = "^3.14.0"
+faker = "^33.0.0"
+hypothesis = "^6.120.0"
+
+[tool.poetry.scripts]
+evaluate = "src.evaluation.judge:main"
+mask-pii = "src.privacy.pii_masker:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+# ============================================================================
+# RUFF CONFIGURATION
+# ============================================================================
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+fix = true
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "B",      # flake8-bugbear
+    "C4",     # flake8-comprehensions
+    "UP",     # pyupgrade
+    "ARG",    # flake8-unused-arguments
+    "SIM",    # flake8-simplify
+    "TCH",    # flake8-type-checking
+    "PTH",    # flake8-use-pathlib
+    "ERA",    # eradicate
+    "RUF",    # ruff-specific rules
+]
+ignore = [
+    "E501",   # line too long (handled by formatter)
+    "B008",   # do not perform function calls in argument defaults
+    "B904",   # raise without from inside except
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*" = ["ARG001", "S101"]
+"notebooks/**/*" = ["E402", "T201"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+
+# ============================================================================
+# MYPY CONFIGURATION
+# ============================================================================
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = [
+    "mlflow.*",
+    "deepgram.*",
+    "spacy.*",
+    "pydub.*",
+    "databricks.*",
+    "pinecone.*",
+    "rank_bm25.*",
+]
+ignore_missing_imports = true
+
+# ============================================================================
+# PYTEST CONFIGURATION
+# ============================================================================
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--tb=short",
+    "-ra",
+]
+markers = [
+    "unit: Unit tests (fast, no external deps)",
+    "integration: Integration tests (require services)",
+    "slow: Slow tests (>10s)",
+]
+asyncio_mode = "auto"
+
+# ============================================================================
+# COVERAGE CONFIGURATION
+# ============================================================================
+[tool.coverage.run]
+source = ["src"]
+branch = true
+omit = [
+    "tests/*",
+    "notebooks/*",
+    "*/__init__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+]
+fail_under = 80
+show_missing = true

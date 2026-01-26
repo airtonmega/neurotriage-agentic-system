@@ -1,0 +1,36 @@
+# NeuroTriage-AI v2.0.0 - MedGemma 1.5 Edition
+# Core dependencies for Cloud Run
+
+# Core LangChain/LangGraph
+langgraph>=0.2.0
+langchain>=0.3.0
+langchain-google-vertexai>=2.0.0
+langchain-community>=0.3.0
+
+# Google Cloud AI
+google-cloud-aiplatform>=1.71.0
+
+# Data Processing
+pydantic>=2.10.0
+
+# Audio Processing - Deepgram (fallback)
+deepgram-sdk>=3.7.0
+pydub>=0.25.1
+
+# Pinecone - RAG
+pinecone-client>=5.0.0
+rank-bm25>=0.2.2
+
+# GCP
+google-cloud-pubsub>=2.24.0
+
+# Async & HTTP
+aiohttp>=3.11.0
+httpx>=0.28.0
+
+# Retry & Resilience
+tenacity>=9.0.0
+
+# Utilities
+python-dotenv>=1.0.0
+structlog>=24.4.0

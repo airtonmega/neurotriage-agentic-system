@@ -1,0 +1,66 @@
+[
+    {
+        "case_id": "emergency_001",
+        "transcription": "Paciente relata dor forte no peito há 30 minutos, irradiando para o braço esquerdo. Está suando frio e sente falta de ar. Tem histórico de hipertensão.",
+        "system_output": "EMERGÊNCIA DETECTADA: Dor torácica típica com irradiação para MSE, sudorese e dispneia. Histórico de HAS. Suspeita de Síndrome Coronariana Aguda (SCA). PRIORIDADE MÁXIMA.",
+        "expected_symptoms": ["dor_toracica", "irradiacao_mse", "sudorese", "dispneia"],
+        "expected_risk_level": "emergency",
+        "has_emergency": true
+    },
+    {
+        "case_id": "routine_001",
+        "transcription": "Paciente com dor de cabeça leve há dois dias, melhora com analgésico comum. Sem febre, sem náusea. Está dormindo bem.",
+        "system_output": "Cefaleia tensional leve, duração 2 dias, responsiva a analgésicos. Sem sinais de alarme. Triagem: ROTINA.",
+        "expected_symptoms": ["cefaleia_leve"],
+        "expected_risk_level": "routine",
+        "has_emergency": false
+    },
+    {
+        "case_id": "urgent_001",
+        "transcription": "Criança de 5 anos com febre alta de 39.5°C há 3 dias, tosse produtiva e dificuldade para respirar. Recusa alimentação.",
+        "system_output": "Síndrome febril prolongada em pediatria com sinais respiratórios. Febre 39.5°C por 3 dias + tosse + dispneia + hiporexia. Triagem: URGENTE. Necessita avaliação presencial.",
+        "expected_symptoms": ["febre_alta", "tosse_produtiva", "dispneia", "hiporexia"],
+        "expected_risk_level": "urgent",
+        "has_emergency": false
+    },
+    {
+        "case_id": "emergency_002",
+        "transcription": "Idoso de 78 anos acordou com fraqueza no braço direito e dificuldade para falar. A boca está torta. Sintomas começaram há 1 hora.",
+        "system_output": "EMERGÊNCIA - SUSPEITA DE AVC: Déficit motor em MSD + disartria + desvio de rima labial. Início agudo há 1 hora. FAST positivo. Janela terapêutica ATIVA. PRIORIDADE ZERO.",
+        "expected_symptoms": ["hemiparesia_direita", "disartria", "desvio_rima_labial"],
+        "expected_risk_level": "emergency",
+        "has_emergency": true
+    },
+    {
+        "case_id": "hallucination_test_001",
+        "transcription": "Paciente com dor nas costas há uma semana, piora quando fica muito tempo sentado. Já usou relaxante muscular sem melhora.",
+        "system_output": "Lombalgia mecânica crônica, duração 1 semana. Piora postural. Tentou relaxante muscular e anti-inflamatório sem sucesso. Exame de imagem mostra hérnia de disco.",
+        "expected_symptoms": ["lombalgia"],
+        "expected_risk_level": "routine",
+        "has_emergency": false
+    },
+    {
+        "case_id": "emergency_miss_001",
+        "transcription": "Mulher de 45 anos com dor abdominal intensa há 6 horas, vômitos e abdome rígido ao toque. Parou de eliminar gases.",
+        "system_output": "Dor abdominal com vômitos. Orientado repouso e dieta leve. Triagem: ROTINA.",
+        "expected_symptoms": ["dor_abdominal_intensa", "vomitos", "abdome_rigido", "parada_eliminacao_gases"],
+        "expected_risk_level": "emergency",
+        "has_emergency": true
+    },
+    {
+        "case_id": "routine_002",
+        "transcription": "Paciente solicita renovação de receita de losartana 50mg que usa há 2 anos para pressão. Última consulta há 3 meses, tudo normal.",
+        "system_output": "Solicitação administrativa: renovação de receita de Losartana 50mg. Hipertensão controlada. Última avaliação há 3 meses sem alterações. Triagem: ROTINA - ADMINISTRATIVA.",
+        "expected_symptoms": [],
+        "expected_risk_level": "routine",
+        "has_emergency": false
+    },
+    {
+        "case_id": "urgent_002",
+        "transcription": "Gestante de 32 semanas com inchaço nas pernas há 3 dias, dor de cabeça forte e visão embaçada desde ontem. Pressão em casa estava 150x100.",
+        "system_output": "URGENTE - ALERTA OBSTÉTRICO: Gestante 32 semanas com tríade de pré-eclâmpsia: edema + cefaleia intensa + distúrbio visual. PA 150x100 aferida. Risco materno-fetal. Avaliação imediata.",
+        "expected_symptoms": ["edema_mmii", "cefaleia_intensa", "disturbio_visual", "hipertensao"],
+        "expected_risk_level": "urgent",
+        "has_emergency": false
+    }
+]
