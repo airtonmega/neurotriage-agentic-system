@@ -102,7 +102,7 @@ npm run dev
 
 ## 👨‍💻 Autor
 
-Desenvolvido por **[Seu Nome]**
+Desenvolvido por **[Airton Gomes](https://www.linkedin.com/in/airton-gomes-31a943236/)**
 *Engenheiro de Software Sênior / AI Specialist*
 
 ---
