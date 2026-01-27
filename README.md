@@ -1,7 +1,6 @@
 # 🧠 NeuroTriage AI: Agentic Medical Intelligent System
 
-![NeuroTriage Banner](https://via.placeholder.com/1200x600/0f172a/3b82f6?text=NeuroTriage+AI+Architecture)
-*(Substitua por um screenshot do seu Dashboard "Glass Box")*
+
 
 > **State-of-the-Art Medical Triage System** powered by **MedGemma 1.5**, **Deepgram Nova-3 Medical** and **Google Cloud Run**.
 
