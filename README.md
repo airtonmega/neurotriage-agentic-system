@@ -9,6 +9,10 @@
 [![React](https://img.shields.io/badge/Frontend-React_18-61DAFB?logo=react)](https://react.dev/)
 [![Python](https://img.shields.io/badge/Backend-Python_3.11-3776AB?logo=python)](https://www.python.org/)
 
+
+> [!NOTE]
+> **🔴 LIVE DEMO**: [Acessar NeuroTriage v2 (Cloud Run)](https://neurotriage-ai-frontend-10993113678.us-central1.run.app/)
+
 ---
 
 ## 🚀 Sobre o Projeto - [VEJA UMA DEMONSTRAÇÃO BÁSICA AQUI](https://neurotriage-ai-frontend-10993113678.us-central1.run.app/)

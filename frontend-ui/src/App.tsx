@@ -111,7 +111,7 @@ function App() {
         await new Promise(r => setTimeout(r, 1500));
 
         try {
-            const API_URL = "https://neurotriage-ai-10993113678.us-central1.run.app/triage";
+            const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/triage";
             const response = await axios.post(API_URL, {
                 transcription: input,
                 conversation_id: "hourglass-v2-" + Date.now()
@@ -150,7 +150,8 @@ function App() {
     };
 
     return (
-        <div className="flex h-screen overflow-hidden p-6 gap-6 relative font-sans text-slate-800 bg-[#eef2f6]">
+
+        <div className="flex min-h-screen overflow-y-auto lg:overflow-hidden p-4 lg:p-6 gap-6 relative font-sans text-slate-800 bg-[#eef2f6]">
             {/* Background elements */}
             <div className="absolute top-0 left-0 w-full h-full bg-soft-gradient -z-20" />
             <div className="absolute inset-0 bg-mesh-gradient opacity-30 -z-10 blur-3xl pointer-events-none" />
@@ -159,16 +160,16 @@ function App() {
             <header className="absolute top-4 left-6 flex items-center gap-3 z-50">
                 <div className="bg-blue-600 p-2 rounded-lg shadow-lg"><Activity className="text-white w-5 h-5" /></div>
                 <div>
-                    <h1 className="text-xl font-bold tracking-tight text-slate-900 leading-none">NeuroTriage OS</h1>
-                    <p className="text-xs text-slate-500 font-medium">Medical Intelligence Kernel v2.0.1</p>
+                    <h1 className="text-lg lg:text-xl font-bold tracking-tight text-slate-900 leading-none">NeuroTriage OS</h1>
+                    <p className="text-[10px] lg:text-xs text-slate-500 font-medium">Medical Intelligence Kernel v2.0.1</p>
                 </div>
             </header>
 
             {/* MAIN GRID */}
-            <div className="mt-14 w-full h-full grid grid-cols-12 gap-6 pb-2">
+            <div className="mt-14 w-full h-auto lg:h-full grid grid-cols-1 lg:grid-cols-12 gap-6 pb-2">
 
                 {/* === COLUMN 1: INPUT CHANNEL (3 cols) === */}
-                <div className="col-span-12 lg:col-span-3 flex flex-col gap-4 h-[calc(100%-2rem)]">
+                <div className="col-span-1 lg:col-span-3 flex flex-col gap-4 h-auto lg:h-[calc(100%-2rem)]">
 
                     {/* Input Card */}
                     <GlassCard className="flex flex-col gap-3 flex-shrink-0">
@@ -186,11 +187,11 @@ function App() {
                             />
                         </div>
 
-                        <div className="flex gap-2">
-                            <button onClick={() => setInput("Paciente com dor torácica intensa, irradiando para MSE, sudorese, náuseas.")} className="flex-1 text-[10px] bg-white border border-slate-200 text-slate-600 px-2 py-2 rounded shadow-sm hover:bg-slate-50 transition-colors font-semibold">
+                        <div className="flex gap-2 flex-col lg:flex-row">
+                            <button onClick={() => setInput("Paciente com dor torácica intensa, irradiando para MSE, sudorese, náuseas.")} className="flex-1 text-[10px] bg-white border border-slate-200 text-slate-600 px-2 py-3 lg:py-2 rounded shadow-sm hover:bg-slate-50 transition-colors font-semibold active:scale-95 touch-manipulation">
                                 Caso Emergência (IAM)
                             </button>
-                            <button onClick={() => setInput("Criança com febre de 38 graus há 2 dias, coriza e tosse produtiva.")} className="flex-1 text-[10px] bg-white border border-slate-200 text-slate-600 px-2 py-2 rounded shadow-sm hover:bg-slate-50 transition-colors font-semibold">
+                            <button onClick={() => setInput("Criança com febre de 38 graus há 2 dias, coriza e tosse produtiva.")} className="flex-1 text-[10px] bg-white border border-slate-200 text-slate-600 px-2 py-3 lg:py-2 rounded shadow-sm hover:bg-slate-50 transition-colors font-semibold active:scale-95 touch-manipulation">
                                 Caso Urgência (Infecção)
                             </button>
                         </div>
@@ -215,9 +216,9 @@ function App() {
                 </div>
 
                 {/* === COLUMN 2: PIPELINE VISUALIZATION (5 cols) === */}
-                <div className="col-span-12 lg:col-span-5 flex flex-col items-center justify-center h-[calc(100%-2rem)] relative px-4">
+                <div className="col-span-1 lg:col-span-5 flex flex-col items-center justify-center h-auto lg:h-[calc(100%-2rem)] relative px-0 lg:px-4 py-8 lg:py-0">
                     {/* Connecting Line */}
-                    <div className="absolute left-1/2 top-4 bottom-4 w-0.5 bg-slate-300/50 -z-10 -translate-x-1/2" />
+                    <div className="hidden lg:block absolute left-1/2 top-4 bottom-4 w-0.5 bg-slate-300/50 -z-10 -translate-x-1/2" />
 
                     <div className="w-full space-y-6">
                         <GlassInspector
@@ -250,7 +251,7 @@ function App() {
                 </div>
 
                 {/* === COLUMN 3: OUTPUT RESULT (4 cols) === */}
-                <div className="col-span-12 lg:col-span-4 flex flex-col gap-4 h-[calc(100%-2rem)] justify-center">
+                <div className="col-span-1 lg:col-span-4 flex flex-col gap-4 h-auto lg:h-[calc(100%-2rem)] justify-center">
                     <AnimatePresence mode="wait">
                         {result ? (
                             <motion.div
@@ -267,7 +268,7 @@ function App() {
                                         <span className="text-xs font-bold uppercase text-slate-400">Classificação Final</span>
                                     </div>
 
-                                    <h2 className="text-4xl font-black text-slate-800 mb-2 uppercase tracking-tight">{result.risk_level}</h2>
+                                    <h2 className="text-3xl lg:text-4xl font-black text-slate-800 mb-2 uppercase tracking-tight">{result.risk_level}</h2>
                                     <div className="text-xs font-mono font-bold text-slate-500 mb-8">Confiança AI: {(result.confidence * 100).toFixed(1)}%</div>
 
                                     <div className="space-y-6">

@@ -1,0 +1,6 @@
+project_id       = "fretadonow-saas"
+region           = "us-central1"
+environment      = "prod"
+deepgram_api_key = "652c504be993ae414719b319298a2892bfc61457"
+pinecone_api_key = "pcsk_2vYKYa_TR5NaRfQpsC9J4oSf6vRBrStYvxxMBsmCTKavhUDoykJx2xiuSW7wvmgyLk3ZaB"
+medgemma_enabled = "true"

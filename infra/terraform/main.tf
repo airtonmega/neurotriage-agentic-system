@@ -20,16 +20,10 @@ terraform {
       source  = "hashicorp/google-beta"
       version = "~> 6.0"
     }
-    databricks = {
-      source  = "databricks/databricks"
-      version = "~> 1.60"
-    }
+
   }
   
-  backend "gcs" {
-    bucket = "neurotriage-terraform-state"
-    prefix = "terraform/state"
-  }
+
 }
 
 # ============================================================================
@@ -53,17 +47,25 @@ variable "environment" {
   default     = "dev"
 }
 
-variable "databricks_host" {
-  description = "Databricks workspace URL"
+variable "deepgram_api_key" {
+  description = "Deepgram API Key"
   type        = string
   sensitive   = true
 }
 
-variable "databricks_token" {
-  description = "Databricks access token"
+variable "pinecone_api_key" {
+  description = "Pinecone API Key"
   type        = string
   sensitive   = true
 }
+
+variable "medgemma_enabled" {
+  description = "Enable MedGemma Extractor"
+  type        = string
+  default     = "true"
+}
+
+
 
 # ============================================================================
 # PROVIDERS
@@ -79,10 +81,7 @@ provider "google-beta" {
   region  = var.region
 }
 
-provider "databricks" {
-  host  = var.databricks_host
-  token = var.databricks_token
-}
+
 
 # ============================================================================
 # LOCALS
@@ -101,20 +100,22 @@ locals {
 # ENABLE APIS
 # ============================================================================
 
-resource "google_project_service" "apis" {
-  for_each = toset([
-    "pubsub.googleapis.com",
-    "run.googleapis.com",
-    "secretmanager.googleapis.com",
-    "aiplatform.googleapis.com",
-    "cloudbuild.googleapis.com",
-    "artifactregistry.googleapis.com",
-  ])
-  
-  project            = var.project_id
-  service            = each.value
-  disable_on_destroy = false
-}
+# resource "google_project_service" "apis" {
+#   for_each = toset([
+#     "pubsub.googleapis.com",
+#     "iam.googleapis.com",
+#     "run.googleapis.com",
+#     "run.googleapis.com",
+#     "secretmanager.googleapis.com",
+#     "aiplatform.googleapis.com",
+#     "cloudbuild.googleapis.com",
+#     "artifactregistry.googleapis.com",
+#   ])
+#   
+#   project            = var.project_id
+#   service            = each.value
+#   disable_on_destroy = false
+# }
 
 # ============================================================================
 # SERVICE ACCOUNT
@@ -124,6 +125,8 @@ resource "google_service_account" "neurotriage" {
   account_id   = "neurotriage-sa"
   display_name = "NeuroTriage AI Service Account"
   description  = "Service account for NeuroTriage AI processing"
+  
+  depends_on = []
 }
 
 # IAM bindings for the service account
@@ -153,7 +156,7 @@ resource "google_pubsub_topic" "audio_input" {
   
   message_retention_duration = "86400s"  # 24 hours
   
-  depends_on = [google_project_service.apis["pubsub.googleapis.com"]]
+#  depends_on = [google_project_service.apis["pubsub.googleapis.com"]]
 }
 
 # Audio input subscription
@@ -187,7 +190,7 @@ resource "google_pubsub_topic" "results" {
   name   = "${local.service_name}-results"
   labels = local.labels
   
-  depends_on = [google_project_service.apis["pubsub.googleapis.com"]]
+#  depends_on = [google_project_service.apis["pubsub.googleapis.com"]]
 }
 
 # Dead letter topic
@@ -195,7 +198,7 @@ resource "google_pubsub_topic" "dead_letter" {
   name   = "${local.service_name}-dead-letter"
   labels = local.labels
   
-  depends_on = [google_project_service.apis["pubsub.googleapis.com"]]
+#  depends_on = [google_project_service.apis["pubsub.googleapis.com"]]
 }
 
 # Emergency alerts topic (high priority)
@@ -203,29 +206,14 @@ resource "google_pubsub_topic" "emergency_alerts" {
   name   = "${local.service_name}-emergency-alerts"
   labels = local.labels
   
-  depends_on = [google_project_service.apis["pubsub.googleapis.com"]]
+#  depends_on = [google_project_service.apis["pubsub.googleapis.com"]]
 }
 
 # ============================================================================
 # SECRET MANAGER
 # ============================================================================
 
-resource "google_secret_manager_secret" "databricks_token" {
-  secret_id = "${local.service_name}-databricks-token"
-  
-  labels = local.labels
-  
-  replication {
-    auto {}
-  }
-  
-  depends_on = [google_project_service.apis["secretmanager.googleapis.com"]]
-}
 
-resource "google_secret_manager_secret_version" "databricks_token" {
-  secret      = google_secret_manager_secret.databricks_token.id
-  secret_data = var.databricks_token
-}
 
 resource "google_secret_manager_secret" "pii_salt" {
   secret_id = "${local.service_name}-pii-salt"
@@ -236,7 +224,7 @@ resource "google_secret_manager_secret" "pii_salt" {
     auto {}
   }
   
-  depends_on = [google_project_service.apis["secretmanager.googleapis.com"]]
+
 }
 
 # ============================================================================
@@ -251,7 +239,7 @@ resource "google_artifact_registry_repository" "neurotriage" {
   
   labels = local.labels
   
-  depends_on = [google_project_service.apis["artifactregistry.googleapis.com"]]
+#  depends_on = [google_project_service.apis["artifactregistry.googleapis.com"]]
 }
 
 # ============================================================================
@@ -306,14 +294,21 @@ resource "google_cloud_run_v2_service" "processor" {
       }
       
       env {
-        name = "DATABRICKS_TOKEN"
-        value_source {
-          secret_key_ref {
-            secret  = google_secret_manager_secret.databricks_token.secret_id
-            version = "latest"
-          }
-        }
+        name  = "DEEPGRAM_API_KEY"
+        value = var.deepgram_api_key
       }
+      
+      env {
+        name  = "PINECONE_API_KEY"
+        value = var.pinecone_api_key
+      }
+      
+      env {
+        name  = "MEDGEMMA_ENABLED"
+        value = var.medgemma_enabled
+      }
+      
+
       
       startup_probe {
         http_get {
@@ -340,9 +335,68 @@ resource "google_cloud_run_v2_service" "processor" {
   }
   
   depends_on = [
-    google_project_service.apis["run.googleapis.com"],
+#    google_project_service.apis["run.googleapis.com"],
     google_artifact_registry_repository.neurotriage,
   ]
+}
+
+# Frontend Service
+resource "google_cloud_run_v2_service" "frontend" {
+  name     = "${local.service_name}-frontend"
+  location = var.region
+  
+  labels = local.labels
+  
+  template {
+    service_account = google_service_account.neurotriage.email
+    
+    scaling {
+      min_instance_count = 0
+      max_instance_count = 10
+    }
+    
+    containers {
+      image = "${var.region}-docker.pkg.dev/${var.project_id}/${local.service_name}/frontend:latest"
+      
+      resources {
+        limits = {
+          cpu    = "1"
+          memory = "512Mi"
+        }
+      }
+      
+      env {
+        name  = "PORT"
+        value = "8080"
+      }
+    }
+  }
+  
+  traffic {
+    percent = 100
+    type    = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
+  }
+  
+  depends_on = [
+#    google_project_service.apis["run.googleapis.com"],
+    google_artifact_registry_repository.neurotriage,
+  ]
+}
+
+# Public Access for Frontend
+resource "google_cloud_run_service_iam_member" "frontend_public" {
+  service  = google_cloud_run_v2_service.frontend.name
+  location = google_cloud_run_v2_service.frontend.location
+  role     = "roles/run.invoker"
+  member   = "allUsers"
+}
+
+# Public Access for Backend (so Browser can call it)
+resource "google_cloud_run_service_iam_member" "processor_public" {
+  service  = google_cloud_run_v2_service.processor.name
+  location = google_cloud_run_v2_service.processor.location
+  role     = "roles/run.invoker"
+  member   = "allUsers"
 }
 
 # ============================================================================
@@ -352,6 +406,11 @@ resource "google_cloud_run_v2_service" "processor" {
 output "service_url" {
   description = "URL of the Cloud Run processor service"
   value       = google_cloud_run_v2_service.processor.uri
+}
+
+output "frontend_url" {
+  description = "URL of the Cloud Run frontend service"
+  value       = google_cloud_run_v2_service.frontend.uri
 }
 
 output "pubsub_topics" {

@@ -1,0 +1,33 @@
+steps:
+  # Build Backend
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/processor:latest', '.']
+    dir: '.'
+    id: 'Build Backend'
+
+  # Build Frontend
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/frontend:latest', '.']
+    dir: 'frontend-ui'
+    id: 'Build Frontend'
+    waitFor: ['-'] # Run in parallel
+
+  # Push Backend
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/processor:latest']
+    id: 'Push Backend'
+    waitFor: ['Build Backend']
+
+  # Push Frontend
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/frontend:latest']
+    id: 'Push Frontend'
+    waitFor: ['Build Frontend']
+
+substitutions:
+  _REGION: 'us-central1'
+  _REPO_NAME: 'neurotriage-ai'
+
+images:
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/processor:latest'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/frontend:latest'
