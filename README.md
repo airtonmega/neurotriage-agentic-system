@@ -11,7 +11,7 @@
 
 ---
 
-## 🚀 Sobre o Projeto
+## 🚀 Sobre o Projeto - [VEJA UMA DEMONSTRAÇÃO BÁSICA AQUI](https://neurotriage-ai-frontend-10993113678.us-central1.run.app/)
 
 O **NeuroTriage AI** é uma plataforma de triagem médica de alta fidelidade projetada para demonstrar o poder de **Agentes de IA Generativa** em ambientes clínicos críticos. Diferente de chatbots comuns, este sistema implementa uma arquitetura **"Glass Box"**, permitindo total auditabilidade e transparência das decisões da IA.
 
